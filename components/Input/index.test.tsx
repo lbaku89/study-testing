@@ -43,3 +43,12 @@ test("X 버튼 클릭 시 입력값이 없지는지 테스트", () => {
   // X 버튼이 사라진다.
   expect(deleteButton).not.toBeInTheDocument();
 });
+
+test("Input 컴포넌트 에러 발생 시 에러 메시지가 보이는지 테스트", () => {
+  render(<Input isError={true} errorMessage="입력값에 문제가 있습니다." />);
+
+  const errorMessage = screen.getByText("입력값에 문제가 있습니다.");
+
+  // 에러 메시지가 보인다.
+  expect(errorMessage).toBeInTheDocument();
+});

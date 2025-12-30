@@ -12,6 +12,8 @@ interface InputProps {
   type?: "text" | "password" | "email" | "number"; // 필요한 타입을 추가할 수 있습니다.
   placeholder?: string;
   // 추가적인 props가 필요하다면 여기에 정의할 수 있습니다.
+  isError?: boolean;
+  errorMessage?: string;
 }
 export const Input = ({
   id,
@@ -19,8 +21,12 @@ export const Input = ({
   defaultValue = "",
   type = "text",
   placeholder,
+  isError = false,
+  errorMessage = "",
 }: InputProps) => {
   const [value, setValue] = useState(defaultValue);
+  const borderColor = isError ? "border-red-500" : "border-gray-300";
+
   return (
     <div className="relative inline-block w-full">
       <input
@@ -30,7 +36,7 @@ export const Input = ({
         placeholder={placeholder}
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="p-2 pr-8 border border-gray-300 rounded-md w-full"
+        className={`p-2 pr-8 border ${borderColor} rounded-md w-full`}
       />
       {value && (
         <button
@@ -41,6 +47,9 @@ export const Input = ({
         >
           <DeleteIconButton />
         </button>
+      )}
+      {isError && (
+        <span className="text-red-500 text-sm mt-1 ml-1">{errorMessage}</span>
       )}
     </div>
   );
