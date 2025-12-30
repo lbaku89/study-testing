@@ -66,4 +66,24 @@ describe("로그인 폼 렌더링 테스트", () => {
       /* ... */
     });
   });
+
+  describe("로그인 요청 테스트", () => {
+    test("로그인 성공 시 '로그인 성공' 모달창이 나타나는지 확인", async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: jest.fn().mockResolvedValue({ message: "로그인 성공" }),
+      });
+
+      // 이메일과 비밀번호 입력
+      fireEvent.change(emailInput, { target: { value: "test@test.com" } });
+      fireEvent.change(passwordInput, { target: { value: "123456" } });
+
+      // 로그인 버튼 클릭
+      fireEvent.click(loginButton);
+
+      // 모달창이 나타나는지 확인
+      const modal = await screen.findByText("로그인 성공");
+      expect(modal).toBeInTheDocument();
+    });
+  });
 });

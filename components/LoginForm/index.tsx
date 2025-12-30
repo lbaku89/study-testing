@@ -15,6 +15,9 @@ export const LoginForm = () => {
     password: "",
   });
 
+  // 간단한 로그인 성공 여부 모달창 띄우기 (실제로는 따로 개발하는 것이 적절)
+  const [showModal, setShowModal] = useState(false);
+
   // 이메일 유효성 검사 함수
   const validateEmail = (email: string) => {
     if (!email) return "이메일을 입력하세요.";
@@ -53,46 +56,90 @@ export const LoginForm = () => {
     }));
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // 로그인 로직 처리
+    try {
+      // route handler로 로그인 POST 요청 보내기
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error);
+      }
+
+      setShowModal(true);
+    } catch (error) {
+      alert("로그인 요청 중 오류 발생: " + error);
+    }
+  };
+
   return (
-    <form className="flex flex-col gap-4 w-80 p-6 bg-white">
-      <div>
-        <label htmlFor="email" className="block mb-2">
-          이메일
-        </label>
-        <Input
-          id="email"
-          name="email"
-          value={values.email}
-          onChange={handleChange}
-          type="email"
-          placeholder="이메일을 입력하세요"
-          isError={!!errors.email}
-          errorMessage={errors.email}
-          onDelete={() => handleDelete("email")} // X 버튼 클릭 시 이메일 지우기
-        />
-      </div>
-      <div>
-        <label htmlFor="password" className="block mb-2">
-          비밀번호
-        </label>
-        <Input
-          id="password"
-          name="password"
-          value={values.password}
-          onChange={handleChange}
-          type="password"
-          placeholder="비밀번호를 입력하세요"
-          isError={!!errors.password}
-          errorMessage={errors.password}
-          onDelete={() => handleDelete("password")} // X 버튼 클릭 시 비밀번호 지우기
-        />
-      </div>
-      <button
-        className="bg-blue-500 rounded-md w-full cursor-pointer p-2 text-white"
-        disabled={!values.email || !values.password}
+    <>
+      <form
+        className="flex flex-col gap-4 w-80 p-6 bg-white"
+        onSubmit={handleSubmit}
       >
-        로그인
-      </button>
-    </form>
+        <div>
+          <label htmlFor="email" className="block mb-2">
+            이메일
+          </label>
+          <Input
+            id="email"
+            name="email"
+            value={values.email}
+            onChange={handleChange}
+            type="email"
+            placeholder="이메일을 입력하세요"
+            isError={!!errors.email}
+            errorMessage={errors.email}
+            onDelete={() => handleDelete("email")} // X 버튼 클릭 시 이메일 지우기
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className="block mb-2">
+            비밀번호
+          </label>
+          <Input
+            id="password"
+            name="password"
+            value={values.password}
+            onChange={handleChange}
+            type="password"
+            placeholder="비밀번호를 입력하세요"
+            isError={!!errors.password}
+            errorMessage={errors.password}
+            onDelete={() => handleDelete("password")} // X 버튼 클릭 시 비밀번호 지우기
+          />
+        </div>
+        <button
+          className="bg-blue-500 rounded-md w-full cursor-pointer p-2 text-white"
+          disabled={!values.email || !values.password}
+        >
+          로그인
+        </button>
+      </form>
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-400">
+          <div className="bg-white p-6 rounded-md">
+            <h2 className="text-lg font-semibold">로그인 성공</h2>
+            <p>환영합니다!</p>
+            <button
+              onClick={() => setShowModal(false)}
+              className="mt-4 bg-blue-500 text-white rounded-md px-4 py-2"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
