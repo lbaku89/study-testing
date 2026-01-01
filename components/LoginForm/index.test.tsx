@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { LoginForm } from "./index";
 
 describe("로그인 폼 렌더링 테스트", () => {
@@ -84,6 +84,50 @@ describe("로그인 폼 렌더링 테스트", () => {
       // 모달창이 나타나는지 확인
       const modal = await screen.findByText("로그인 성공");
       expect(modal).toBeInTheDocument();
+    });
+
+    test("네트워크 에러 발생 시 alert가 호출되는지 확인", async () => {
+      global.fetch = jest.fn().mockRejectedValue(new Error("네트워크 에러"));
+      render(<LoginForm />);
+
+      // 이메일과 비밀번호 입력
+      fireEvent.change(emailInput, { target: { value: "test@test.com" } });
+      fireEvent.change(passwordInput, { target: { value: "123456" } });
+      // 로그인 버튼 클릭
+      fireEvent.click(loginButton);
+
+      window.alert = jest.fn();
+
+      // fireEvent.click(loginButton) 할 시 handler에서 내부적으로 fetch 함수가 호출되며 이 함수는 비동기적으로 일어나므로 이를 기다리기 위해 waitFor 함수를 사용한다.
+      await waitFor(() => {
+        // alert 기능이 호출됐는지 확인
+        expect(window.alert).toHaveBeenCalled();
+
+        // alert 인수로 넘어온 문자열 확인
+        expect(window.alert).toHaveBeenCalledWith(
+          "로그인 요청 중 오류 발생: Error: 네트워크 에러"
+        );
+      });
+    });
+
+    test("네트워크 에러 발생 시 alert가 호출되는지 확인", async () => {
+      global.fetch = jest.fn().mockRejectedValue(new Error("네트워크 에러"));
+
+      render(<LoginForm />);
+      // alert를 spyOn 함수를 통해 감시
+      const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => {});
+
+      fireEvent.change(emailInput, { target: { value: "test@test.com" } });
+      fireEvent.change(passwordInput, { target: { value: "123456" } });
+
+      // 로그인 버튼 클릭
+      fireEvent.click(loginButton);
+
+      await waitFor(() => {
+        expect(alertSpy).toHaveBeenCalledWith(
+          "로그인 요청 중 오류 발생: Error: 네트워크 에러"
+        );
+      });
     });
   });
 });
