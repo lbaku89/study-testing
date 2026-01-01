@@ -129,5 +129,30 @@ describe("로그인 폼 렌더링 테스트", () => {
         );
       });
     });
+
+    test("로그인 실패 시 '로그인 요청 중 오류 발생: Error: 잘못된 이메일 또는 비밀번호입니다.' 라는 얼럿이 나타나는지 확인'", async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: false,
+        json: jest
+          .fn()
+          .mockResolvedValue({ error: "잘못된 이메일 또는 비밀번호입니다." }),
+      });
+
+      render(<LoginForm />);
+
+      fireEvent.change(emailInput, { target: { value: "test@test.com" } });
+      fireEvent.change(passwordInput, { target: { value: "123456" } });
+
+      fireEvent.click(loginButton);
+
+      // alert 모킹
+      const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => {});
+
+      await waitFor(() => {
+        expect(alertSpy).toHaveBeenCalledWith(
+          "로그인 요청 중 오류 발생: Error: 잘못된 이메일 또는 비밀번호입니다."
+        );
+      });
+    });
   });
 });

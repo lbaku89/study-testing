@@ -1,3 +1,9 @@
+// DB라고 가정
+const LOGIN_INFO = {
+  email: "test@example.com",
+  password: "password",
+};
+
 export async function POST(request: Request) {
   // 프론트엔드로부터 이메일과 비밀번호를 받음
   const { email, password } = await request.json();
@@ -8,6 +14,17 @@ export async function POST(request: Request) {
       JSON.stringify({ error: "이메일과 비밀번호를 입력해주세요." }),
       {
         status: 400,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+
+  // 잘못된 로그인 정보 처리
+  if (email !== LOGIN_INFO.email || password !== LOGIN_INFO.password) {
+    return new Response(
+      JSON.stringify({ error: "잘못된 이메일 또는 비밀번호입니다." }),
+      {
+        status: 401,
         headers: { "Content-Type": "application/json" },
       }
     );
