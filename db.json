@@ -1,0 +1,19 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "json-server",
+      "body": "json-server is a simple way to create a REST API with JSON data."
+    },
+    {
+      "id": 2,
+      "title": "react-query",
+      "body": "react-query is a powerful data-fetching library for React applications."
+    },
+    {
+      "id": 3,
+      "title": "next.js",
+      "body": "Next.js is a React framework that enables server-side rendering and static site generation."
+    }
+  ]
+}
