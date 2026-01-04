@@ -13,12 +13,15 @@ test("add 함수의 spyOn 테스트", () => {
 
   // math.add 함수의 반환값이 3인지 확인
   expect(result).toBe(3);
+
+  // addSpy만 모킹 호출 기록 초기화
+  addSpy.mockClear();
 });
 
-beforeEach(() => {
-  // 각 테스트가 실행되기 전에 mock, spyOn을 초기화한다.
-  jest.clearAllMocks();
-});
+// beforeEach(() => {
+//   // 각 테스트가 실행되기 전에 mock, spyOn을 초기화한다.
+//   jest.clearAllMocks();
+// });
 //응용
 test("calculateOrderTotal 함수 실행 시 multiply와 add spy 확인", () => {
   const addSpy = jest.spyOn(math, "add");
@@ -31,7 +34,7 @@ test("calculateOrderTotal 함수 실행 시 multiply와 add spy 확인", () => {
 
   // multiply가 2번 호출되는지
   expect(multiplySpy).toHaveBeenCalledTimes(2);
-  // 첫번째 multiply가 price, quantity로 호출되는지
+  // 첫번째 multiply가 price, quantity로 호출되는지`
   expect(multiplySpy).toHaveBeenNthCalledWith(1, mockPrice, mockQuantity);
   // 두번째 multiply가 (price*quantity), 0.9로 호출되는지
   expect(multiplySpy).toHaveBeenNthCalledWith(2, 20000, 0.9);
@@ -42,4 +45,54 @@ test("calculateOrderTotal 함수 실행 시 multiply와 add spy 확인", () => {
   // 실제 내부 기능이 온전히 동작하여 결과가 제대로 나오는지
   // ex) (10000 * 2 * 0.9) + 3500 = 21500
   expect(total).toBe(21500);
+
+  multiplySpy.mockClear();
+});
+
+test("multiply 테스트", () => {
+  const multiplySpy = jest.spyOn(math, "multiply");
+  // const result = math.multiply(10, 20)
+  expect(multiplySpy).toHaveBeenCalledTimes(0);
+});
+
+test("mockClear 예제", () => {
+  // 호출하기
+  const addSpy = jest.spyOn(math, "add");
+
+  // 1회 호출되었는지 확인
+  math.add(1, 2);
+
+  // mockClear 호출 기록 초기화
+  addSpy.mockClear();
+
+  // 호출 기록 초기화됐는지 확인
+  expect(addSpy).toHaveBeenCalledTimes(0);
+});
+
+test("mockClear 예제", () => {
+  const addSpy = jest.spyOn(math, "add");
+
+  // 강제로 반환값 설정하기
+  addSpy.mockReturnValue(100);
+  // addSpy.mockImplementation((a, b) => {
+  //   return a + b + 100;
+  // });
+
+  // 호출하기
+  math.add(1, 2);
+
+  // 1회 호출되었는지 확인
+  expect(addSpy).toHaveBeenCalledTimes(1);
+
+  // 반환값이 100인지 확인
+  expect(math.add(1, 2)).toBe(100);
+
+  // mockClear로 호출 기록 초기화
+  addSpy.mockRestore();
+
+  // 호출 기록 초기화됐는지 확인
+  expect(addSpy).toHaveBeenCalledTimes(0);
+
+  // 반환값이 복원됐는지 확인
+  expect(math.add(1, 2)).toBe(3);
 });
